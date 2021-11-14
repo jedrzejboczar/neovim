@@ -660,7 +660,14 @@ void op_reindent(oparg_T *oap, Indenter how)
         amount = how();                     // get the indent for this line
       }
       if (amount >= 0 && set_indent(amount, SIN_UNDO)) {
-        // did change the indent, call changed_lines() later
+        // make sure to update changedtick now
+        // should this be TRUE or FALSE?
+        // clients probably don't need updates on each line,
+        // but don't know
+        bool do_buf_event = false;
+        changed_lines(curwin->w_cursor.lnum, 0,
+                      curwin->w_cursor.lnum + 1, 0L,
+                      do_buf_event);
         if (first_changed == 0) {
           first_changed = curwin->w_cursor.lnum;
         }
